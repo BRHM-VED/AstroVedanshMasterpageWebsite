@@ -1,6 +1,15 @@
 #!/bin/bash
 echo "=== Starting VPS Build & Deployment ==="
 
+# Load NVM if present
+if [ -f "$HOME/.nvm/nvm.sh" ]; then
+    echo "Loading NVM from $HOME/.nvm/nvm.sh..."
+    source "$HOME/.nvm/nvm.sh"
+elif [ -f "/root/.nvm/nvm.sh" ]; then
+    echo "Loading NVM from /root/.nvm/nvm.sh..."
+    source "/root/.nvm/nvm.sh"
+fi
+
 # Install dependencies
 echo "Installing npm dependencies..."
 npm install
