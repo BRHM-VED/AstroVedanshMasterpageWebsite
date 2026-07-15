@@ -7,6 +7,7 @@ import {
   SITE, REPORTS, SERVICES, PRODUCTS, TESTIMONIALS, TESTIMONIAL_SCREENSHOTS, SIGNS, POSTS, FAQS,
 } from '../data/content.js'
 import { useState } from 'react'
+import { useSEO } from '../lib/seo.js'
 
 /* ---------------------------------- Hero ---------------------------------- */
 
@@ -64,21 +65,31 @@ function SignatureReports() {
       <div className="container-av py-8 md:py-12">
         <div className="grid gap-4 md:grid-cols-2 md:gap-6">
           {REPORTS.map((r) => (
-            <a key={r.id} href={r.href} className="card group flex items-center gap-4 sm:gap-5">
-              <img
-                src={r.img}
-                alt=""
-                className="h-14 w-14 shrink-0 rounded-full border-2 border-gold-500/50 object-cover sm:h-16 sm:w-16"
-              />
-              <span className="min-w-0 flex-1">
-                <span className="font-heading text-[11px] font-bold uppercase tracking-[0.2em] text-gold-600">
-                  Signature Report
+            <a key={r.id} href={r.href} className="card group flex flex-col gap-4">
+              <span className="flex items-center gap-4">
+                <img
+                  src={r.img}
+                  alt={`${r.title} logo`}
+                  className="h-14 w-14 shrink-0 rounded-full border-2 border-gold-500/50 object-cover"
+                />
+                <span className="min-w-0">
+                  <span className="font-heading text-[11px] font-bold uppercase tracking-[0.2em] text-gold-600">
+                    Signature Report
+                  </span>
+                  <h2 className="font-display text-2xl leading-tight text-maroon-900">{r.title}</h2>
                 </span>
-                <h2 className="font-display text-2xl leading-tight text-maroon-900">{r.title}</h2>
-                <p className="mt-0.5 text-sm text-maroon-950/65">{r.desc}</p>
               </span>
-              <span className="btn-primary hidden shrink-0 !px-5 !py-2.5 text-sm lg:inline-flex">{r.cta}</span>
-              <span className="shrink-0 text-xl text-maroon-700 transition group-hover:translate-x-1 lg:hidden">→</span>
+              <span className="space-y-1.5 text-sm">
+                <p className="text-maroon-950/85">
+                  <strong className="font-heading font-bold text-maroon-900">Best for:</strong> {r.bestFor}
+                </p>
+                <p className="text-maroon-950/70">
+                  <strong className="font-heading font-bold text-maroon-900">You get:</strong> {r.get}
+                </p>
+              </span>
+              <span className="btn-primary mt-auto self-start !px-5 !py-2.5 text-sm">
+                {r.cta} <span className="transition group-hover:translate-x-1">→</span>
+              </span>
             </a>
           ))}
         </div>
@@ -247,56 +258,37 @@ function ShopTeaser() {
 
 function Testimonials() {
   const { data: testimonials } = useApi('/testimonials', TESTIMONIALS)
-  const [shot, setShot] = useState(0)
   return (
     <section className="section-pad bg-cream-100/70">
       <div className="container-av">
-        <div className="grid items-start gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-          <div>
-            <SectionHeading
-              align="left"
-              eyebrow="A Journey Built on Trust"
-              title="What our clients say"
-              sub="Real conversations, real turnarounds — from careers unblocked to marriages fixed on time."
-            />
-            <div className="columns-1 gap-5 sm:columns-2 [&>*]:mb-5">
-              {testimonials.map((t, i) => (
-                <figure key={t.id} className={`break-inside-avoid rounded-2xl border border-maroon-100 bg-white p-6 shadow-sm ${i % 2 ? 'sm:translate-y-4' : ''} ${i > 1 ? 'hidden sm:block' : ''}`}>
-                  <svg viewBox="0 0 24 24" className="h-6 w-6 text-gold-500/70" fill="currentColor" aria-hidden="true">
-                    <path d="M4 14c0-4.4 2.6-8 7-10l1 1.6C9 7 7.6 8.8 7.3 11H11v8H4v-5zm10 0c0-4.4 2.6-8 7-10l1 1.6c-3 1.4-4.4 3.2-4.7 5.4H21v8h-7v-5z" />
-                  </svg>
-                  <blockquote className="mt-3 text-sm leading-relaxed text-maroon-950/80">{t.text}</blockquote>
-                  <figcaption className="mt-4 flex items-center justify-between">
-                    <span className="font-heading text-sm font-bold text-maroon-900">{t.name}</span>
-                    <Stars n={t.rating || 5} />
-                  </figcaption>
-                </figure>
+        <SectionHeading
+          eyebrow="A Journey Built on Trust"
+          title="What our clients say"
+          sub="Real WhatsApp messages from real clients — shared with permission."
+        />
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {TESTIMONIAL_SCREENSHOTS.map((src, i) => (
+            <figure
+              key={src}
+              className={`overflow-hidden rounded-2xl border border-maroon-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${i > 2 ? 'hidden lg:block lg:col-span-1' : ''} ${i === 3 ? 'lg:col-start-1' : ''}`}
+            >
+              <div className="flex items-center gap-2 border-b border-maroon-100 bg-cream-50 px-4 py-2.5">
+                <span className="h-2 w-2 rounded-full bg-[#25D366]" />
+                <span className="font-heading text-[11px] font-bold uppercase tracking-wider text-maroon-950/50">WhatsApp · client feedback</span>
+              </div>
+              <img src={src} alt={`WhatsApp feedback from an AstroVedansh client (${i + 1})`} loading="lazy" className="w-full" />
+            </figure>
+          ))}
+          <div className="flex flex-col justify-center gap-4 rounded-2xl bg-maroon-800 p-7 text-cream-100 sm:col-span-2 lg:col-span-2">
+            <Stars n={5} />
+            <div className="space-y-4">
+              {testimonials.slice(0, 2).map((t) => (
+                <blockquote key={t.id} className="border-l-2 border-gold-400/60 pl-4 text-sm leading-relaxed text-cream-100/85">
+                  "{t.text}" <span className="mt-1 block font-heading text-xs font-bold text-gold-400">— {t.name}</span>
+                </blockquote>
               ))}
             </div>
-          </div>
-          <div className="lg:sticky lg:top-28">
-            <div className="relative mx-auto max-w-sm">
-              <div className="absolute -inset-3 -rotate-2 rounded-[2rem] border border-gold-500/40" />
-              <div className="relative overflow-hidden rounded-[1.6rem] border border-maroon-100 bg-white shadow-xl">
-                <div className="flex items-center gap-2 border-b border-maroon-100 bg-cream-50 px-5 py-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-maroon-100" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-gold-500/40" />
-                  <span className="ml-2 font-heading text-xs font-bold uppercase tracking-wider text-maroon-950/50">Client messages</span>
-                </div>
-                <img src={TESTIMONIAL_SCREENSHOTS[shot]} alt="Client WhatsApp feedback" className="w-full" />
-              </div>
-              <div className="mt-5 flex justify-center gap-2">
-                {TESTIMONIAL_SCREENSHOTS.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setShot(i)}
-                    aria-label={`Screenshot ${i + 1}`}
-                    className={`h-2 rounded-full transition-all ${i === shot ? 'w-6 bg-maroon-700' : 'w-2 bg-maroon-100 hover:bg-gold-500/50'}`}
-                  />
-                ))}
-              </div>
-              <p className="mt-3 text-center text-xs text-maroon-950/50">Actual client messages, shared with permission</p>
-            </div>
+            <Link to="/consultation" className="btn-gold self-start !px-5 !py-2.5 text-sm">Start Your Own Story</Link>
           </div>
         </div>
       </div>
@@ -421,12 +413,38 @@ function FinalCTA() {
 }
 
 export default function Home() {
+  useSEO({
+    title: 'Vedic Astrologer, Numerologist & Life Counsellor in India',
+    description:
+      "AstroVedansh — India's trusted Vedic astrologer & numerologist. Perfect Career and Perfect Timing reports, kundli analysis, consultations, online puja, remedies. 1 lakh+ clients.",
+    path: '/',
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: FAQS.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      },
+      ...REPORTS.map((r) => ({
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: r.title,
+        description: `Best for: ${r.bestFor}. ${r.get}`,
+        url: r.href,
+        image: 'https://astrovedansh.org' + r.img,
+        brand: { '@type': 'Brand', name: 'AstroVedansh' },
+      })),
+    ],
+  })
   return (
     <>
       <Hero />
       <SignatureReports />
-      <PanchangStrip />
       <Services />
+      <PanchangStrip />
       <FreeTools />
       <ShopTeaser />
       <Testimonials />

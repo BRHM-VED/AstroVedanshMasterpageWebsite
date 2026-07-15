@@ -1,11 +1,37 @@
 import { Link, useParams } from 'react-router-dom'
 import { POSTS } from '../data/content.js'
 import { useApi } from '../lib/api.js'
+import { useSEO, breadcrumbs } from '../lib/seo.js'
 
 export default function BlogPost() {
   const { slug } = useParams()
   const fallback = POSTS.find((p) => p.slug === slug) || null
   const { data: post } = useApi(`/posts/${slug}`, fallback)
+
+  useSEO({
+    title: post ? post.title : 'Article not found',
+    description: post?.excerpt || 'Astrology and numerology articles by AstroVedansh.',
+    path: `/blog/${slug}`,
+    type: 'article',
+    noindex: !post,
+    jsonLd: post
+      ? [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'BlogPosting',
+            headline: post.title,
+            description: post.excerpt,
+            datePublished: post.date || post.published_at,
+            author: { '@type': 'Organization', name: 'AstroVedansh', url: 'https://astrovedansh.org/' },
+            publisher: { '@id': 'https://astrovedansh.org/#org' },
+            mainEntityOfPage: `https://astrovedansh.org/blog/${slug}`,
+            articleSection: post.category,
+            inLanguage: 'en-IN',
+          },
+          breadcrumbs([['Home', '/'], ['Blog', '/blog'], [post.title, `/blog/${slug}`]]),
+        ]
+      : null,
+  })
 
   if (!post) {
     return (

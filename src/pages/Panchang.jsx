@@ -1,9 +1,15 @@
 import { useState } from 'react'
+import { useSEO } from '../lib/seo.js'
 import { PageHero } from '../components/Section.jsx'
 import { panchang } from '../lib/astro.js'
 import { Link } from 'react-router-dom'
 
 export default function Panchang() {
+  useSEO({
+    title: "Today's Panchang — Tithi, Nakshatra, Yoga, Karana & Rahu Kaal",
+    description: 'Free Vedic panchang for any date: tithi, paksha, nakshatra, yoga, karana, vara, moon rashi and rahu kaal, calculated instantly.',
+    path: '/panchang',
+  })
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const p = panchang(new Date(date + 'T06:00:00+05:30'))
   const pretty = new Date(date + 'T06:00:00').toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })

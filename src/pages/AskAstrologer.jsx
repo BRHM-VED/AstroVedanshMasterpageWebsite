@@ -1,7 +1,13 @@
 import { PageHero } from '../components/Section.jsx'
+import { useSEO } from '../lib/seo.js'
 import LeadForm from '../components/LeadForm.jsx'
 
 export default function AskAstrologer() {
+  useSEO({
+    title: 'Ask an Astrologer — One Question, One Honest Answer',
+    description: 'Send one focused question about marriage, career, business or finance with your birth details and get a chart-based answer within 48 hours.',
+    path: '/ask-astrologer',
+  })
   return (
     <>
       <PageHero

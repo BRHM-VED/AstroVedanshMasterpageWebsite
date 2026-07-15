@@ -21,8 +21,8 @@ import Legal from './pages/Legal.jsx'
 import NotFound from './pages/NotFound.jsx'
 
 function ScrollToTop() {
-  const { pathname } = useLocation()
-  useEffect(() => window.scrollTo(0, 0), [pathname])
+  const { pathname, search } = useLocation()
+  useEffect(() => window.scrollTo(0, 0), [pathname, search])
   return null
 }
 

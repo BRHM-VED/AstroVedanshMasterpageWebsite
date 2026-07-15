@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSEO } from '../lib/seo.js'
 import { Link } from 'react-router-dom'
 import { PageHero } from '../components/Section.jsx'
 import { Icon } from '../components/Decor.jsx'
@@ -6,6 +7,11 @@ import { kundliSnapshot } from '../lib/astro.js'
 import { mulank, bhagyank, meaning } from '../lib/numerology.js'
 
 export default function KundliCalculator() {
+  useSEO({
+    title: 'Free Kundli Calculator — Moon Sign, Nakshatra & Birth Tithi',
+    description: 'Instant free Vedic kundli snapshot: moon rashi, sun rashi, nakshatra with pada, birth tithi, mulank and bhagyank. No signup needed.',
+    path: '/free-kundli-calculator',
+  })
   const [form, setForm] = useState({ name: '', date: '', time: '12:00' })
   const [result, setResult] = useState(null)
 
@@ -80,7 +86,10 @@ export default function KundliCalculator() {
                 <p className="mt-4 text-xs text-cream-100/60">
                   This is a simplified snapshot. Exact lagna, dashas and divisional charts need your birth place and a full reading.
                 </p>
-                <Link to="/consultation" className="btn-gold mt-6 w-full">Get the Complete Analysis</Link>
+                <div className="mt-6 rounded-xl border border-gold-400/40 bg-maroon-950/40 p-5 text-center">
+                  <p className="font-heading font-semibold text-cream-100">Want complete personal analysis of your chart?</p>
+                  <Link to="/consultation" className="btn-gold mt-4 w-full">Get Astrology Report</Link>
+                </div>
               </div>
             ) : (
               <div className="flex h-full min-h-72 flex-col items-center justify-center rounded-3xl border-2 border-dashed border-maroon-100 p-10 text-center">

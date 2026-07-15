@@ -1,4 +1,5 @@
 import { PageHero, SectionHeading, Stars } from '../components/Section.jsx'
+import { useSEO } from '../lib/seo.js'
 import LeadForm from '../components/LeadForm.jsx'
 import { TESTIMONIALS } from '../data/content.js'
 
@@ -25,6 +26,11 @@ const PLANS = [
 ]
 
 export default function Consultation() {
+  useSEO({
+    title: 'Astrology Consultation on Call — Career, Marriage, Health, Wealth',
+    description: 'Book a one-on-one call with AstroVedansh. Birth-chart reading, dasha & transit analysis and personalised remedies. 15, 30 and 60-minute plans.',
+    path: '/consultation',
+  })
   return (
     <>
       <PageHero

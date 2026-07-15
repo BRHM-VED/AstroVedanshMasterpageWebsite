@@ -1,7 +1,14 @@
 import { Link } from 'react-router-dom'
 import { Icon } from '../components/Decor.jsx'
+import { useSEO } from '../lib/seo.js'
 
 export default function NotFound() {
+  useSEO({
+    title: 'Page Not Found',
+    description: 'The page you were looking for does not exist on astrovedansh.org.',
+    path: '/404',
+    noindex: true,
+  })
   return (
     <div className="container-av flex flex-col items-center py-28 text-center">
       <span className="flex h-24 w-24 items-center justify-center rounded-full border border-gold-500/40 bg-cream-100 text-maroon-700">

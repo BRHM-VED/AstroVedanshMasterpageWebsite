@@ -1,4 +1,5 @@
 import { PageHero, SectionHeading } from '../components/Section.jsx'
+import { useSEO } from '../lib/seo.js'
 import { IconBadge } from '../components/Decor.jsx'
 import LeadForm from '../components/LeadForm.jsx'
 import { PUJAS } from '../data/content.js'
@@ -12,6 +13,11 @@ const STEPS = [
 ]
 
 export default function PujaServices() {
+  useSEO({
+    title: 'Online Puja Services — Navagraha, Rahu-Ketu, Sade Sati & More',
+    description: 'Book Vedic pujas performed live with full vidhi by experienced pandits: Navagraha Shanti, Rahu-Ketu dosh nivaran, Mangal dosh, Sade Sati, Lakshmi and Saraswati puja.',
+    path: '/online-puja-services',
+  })
   const { data: pujas } = useApi('/pujas', PUJAS)
   return (
     <>

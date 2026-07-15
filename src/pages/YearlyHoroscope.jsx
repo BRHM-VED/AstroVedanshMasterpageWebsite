@@ -1,10 +1,16 @@
 import { PageHero } from '../components/Section.jsx'
+import { useSEO } from '../lib/seo.js'
 import { Glyph } from '../components/Decor.jsx'
 import { SIGNS, YEARLY_FALLBACK } from '../data/content.js'
 import { useApi } from '../lib/api.js'
 import { Link } from 'react-router-dom'
 
 export default function YearlyHoroscope() {
+  useSEO({
+    title: 'Horoscope 2026 — Yearly Predictions for All 12 Signs',
+    description: 'Varshik rashifal 2026: year-ahead astrology predictions for career, marriage, money and health for all 12 rashis, by AstroVedansh.',
+    path: '/horoscope/2026',
+  })
   const { data } = useApi('/horoscopes?period=yearly', null)
   const textFor = (id) => {
     const row = Array.isArray(data) ? data.find((h) => h.sign === id) : null

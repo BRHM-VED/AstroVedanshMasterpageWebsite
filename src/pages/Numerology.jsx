@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSEO } from '../lib/seo.js'
 import { PageHero, SectionHeading } from '../components/Section.jsx'
 import { IconBadge } from '../components/Decor.jsx'
 import LeadForm from '../components/LeadForm.jsx'
@@ -53,6 +54,11 @@ function MiniCalculator() {
 }
 
 export default function Numerology() {
+  useSEO({
+    title: 'Personalised Numerology Report & Name Correction',
+    description: '25-year numerology predictions from your name and date of birth: lucky numbers, dates, colours, gemstones and name-correction guidance.',
+    path: '/numerology-report',
+  })
   return (
     <>
       <PageHero

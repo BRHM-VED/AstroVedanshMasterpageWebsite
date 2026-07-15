@@ -1,9 +1,15 @@
 import { PageHero } from '../components/Section.jsx'
+import { useSEO } from '../lib/seo.js'
 import { IconBadge } from '../components/Decor.jsx'
 import LeadForm from '../components/LeadForm.jsx'
 import { SITE } from '../data/content.js'
 
 export default function Contact() {
+  useSEO({
+    title: 'Contact AstroVedansh — Email, WhatsApp, Social',
+    description: 'Reach the AstroVedansh team for reports, bookings and guidance. Support 10 AM – 7 PM IST, Monday to Saturday.',
+    path: '/contact',
+  })
   return (
     <>
       <PageHero

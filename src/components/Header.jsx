@@ -5,6 +5,15 @@ import { SITE } from '../data/content.js'
 const NAV = [
   { to: '/', label: 'Home' },
   {
+    label: 'Reports',
+    highlight: true,
+    children: [
+      { href: 'https://perfect-career.astrovedansh.com/', label: 'Perfect Career Report' },
+      { href: 'https://perfect-timing.astrovedansh.com/', label: 'Perfect Timing Report' },
+      { to: '/numerology-report', label: 'Numerology Report' },
+    ],
+  },
+  {
     label: 'Horoscope',
     children: [
       { to: '/horoscope/daily', label: 'Daily Horoscope' },
@@ -42,10 +51,22 @@ function Wordmark() {
   )
 }
 
+function NavItem({ item, className, onClick }) {
+  return item.href ? (
+    <a href={item.href} className={className} onClick={onClick}>{item.label}</a>
+  ) : (
+    <NavLink to={item.to} className={className} onClick={onClick}>{item.label}</NavLink>
+  )
+}
+
 function Dropdown({ item }) {
   return (
     <div className="group relative">
-      <button className="flex items-center gap-1 rounded-full px-4 py-2 font-heading text-sm font-semibold text-cream-100/90 transition hover:text-gold-400">
+      <button
+        className={`flex items-center gap-1 rounded-full px-4 py-2 font-heading text-sm font-semibold transition hover:text-gold-400 ${
+          item.highlight ? 'text-gold-400' : 'text-cream-100/90'
+        }`}
+      >
         {item.label}
         <svg className="h-3 w-3 transition group-hover:rotate-180" viewBox="0 0 12 12" fill="currentColor">
           <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
@@ -53,13 +74,11 @@ function Dropdown({ item }) {
       </button>
       <div className="invisible absolute left-0 top-full z-40 min-w-56 rounded-xl border border-maroon-100 bg-white py-2 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100">
         {item.children.map((c) => (
-          <NavLink
-            key={c.to}
-            to={c.to}
+          <NavItem
+            key={c.to || c.href}
+            item={c}
             className="block px-4 py-2.5 font-heading text-sm font-medium text-maroon-900 hover:bg-cream-100"
-          >
-            {c.label}
-          </NavLink>
+          />
         ))}
       </div>
     </div>
@@ -118,14 +137,12 @@ export default function Header() {
         {open && (
           <nav className="border-t border-maroon-700 bg-maroon-800 pb-4 lg:hidden">
             {NAV.flatMap((item) => (item.children ? item.children : [item])).map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
+              <NavItem
+                key={item.to || item.href}
+                item={item}
                 onClick={() => setOpen(false)}
                 className="block px-6 py-3 font-heading font-semibold text-cream-100/90 hover:text-gold-400"
-              >
-                {item.label}
-              </NavLink>
+              />
             ))}
             <div className="px-6 pt-2">
               <Link to="/consultation" onClick={() => setOpen(false)} className="btn-gold w-full text-sm">
