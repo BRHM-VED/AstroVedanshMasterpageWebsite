@@ -436,6 +436,13 @@ export default function Home() {
         url: r.href,
         image: 'https://astrovedansh.org' + r.img,
         brand: { '@type': 'Brand', name: 'AstroVedansh' },
+        offers: {
+          '@type': 'Offer',
+          price: r.price,
+          priceCurrency: 'INR',
+          url: r.href,
+          availability: 'https://schema.org/InStock',
+        },
       })),
     ],
   })
