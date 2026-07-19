@@ -240,10 +240,26 @@ export const YEARLY_FALLBACK = {
   pisces: 'A spiritually rich year. Intuition guides good decisions; creative projects find an audience. Finances firm up after mid-year.',
 }
 
+// Branded 1200×630 cover per category — used whenever a post has no explicit
+// `image` set in the CMS, so every article gets a large, on-brand image for
+// social sharing and Google Discover without needing per-post photography.
+export const CATEGORY_COVERS = {
+  Astrology: '/assets/blog/astrology.png',
+  Numerology: '/assets/blog/numerology.png',
+  Remedies: '/assets/blog/remedies.png',
+  Gemstones: '/assets/blog/gemstones.png',
+  Panchang: '/assets/blog/panchang.png',
+  Marriage: '/assets/blog/marriage.png',
+}
+
+export function coverFor(post) {
+  return post.image || CATEGORY_COVERS[post.category] || CATEGORY_COVERS.Astrology
+}
+
 export const POSTS = [
   {
     id: 1,
-    slug: 'why-online-astrology-consultations-work',
+    slug: 'why-more-people-are-choosing-online-astrology-consultations',
     title: 'Why More People Are Choosing Online Astrology Consultations',
     date: '2026-06-15',
     category: 'Astrology',
@@ -252,7 +268,7 @@ export const POSTS = [
   },
   {
     id: 2,
-    slug: 'numerology-name-correction-guide',
+    slug: 'name-correction-in-numerology-what-actually-changes',
     title: 'Name Correction in Numerology: What Actually Changes?',
     date: '2026-05-28',
     category: 'Numerology',
@@ -261,7 +277,7 @@ export const POSTS = [
   },
   {
     id: 3,
-    slug: 'sade-sati-myths-and-truths',
+    slug: 'sade-sati-myths-truths-and-how-to-sail-through-it',
     title: 'Sade Sati: Myths, Truths and How to Sail Through It',
     date: '2026-05-02',
     category: 'Remedies',
@@ -270,7 +286,7 @@ export const POSTS = [
   },
   {
     id: 4,
-    slug: 'choosing-your-first-gemstone',
+    slug: 'choosing-your-first-gemstone-a-safety-first-guide',
     title: 'Choosing Your First Gemstone: A Safety-First Guide',
     date: '2026-04-10',
     category: 'Gemstones',
@@ -279,7 +295,7 @@ export const POSTS = [
   },
   {
     id: 5,
-    slug: 'panchang-daily-use',
+    slug: 'how-to-use-the-daily-panchang-without-being-a-priest',
     title: 'How to Use the Daily Panchang (Without Being a Priest)',
     date: '2026-03-18',
     category: 'Panchang',
@@ -288,7 +304,7 @@ export const POSTS = [
   },
   {
     id: 6,
-    slug: 'kundli-matching-beyond-gunas',
+    slug: 'kundli-matching-why-36-gunas-are-only-half-the-story',
     title: 'Kundli Matching: Why 36 Gunas Are Only Half the Story',
     date: '2026-02-22',
     category: 'Marriage',

@@ -1,18 +1,30 @@
 import { Link, useParams } from 'react-router-dom'
-import { POSTS } from '../data/content.js'
+import DOMPurify from 'dompurify'
+import { POSTS, coverFor } from '../data/content.js'
 import { useApi } from '../lib/api.js'
-import { useSEO, breadcrumbs } from '../lib/seo.js'
+import { useSEO, breadcrumbs, SITE_URL } from '../lib/seo.js'
+
+const ALLOWED_TAGS = ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h2', 'h3', 'blockquote']
+
+// CMS posts may still hold legacy plain text (paragraphs separated by blank
+// lines) alongside newer rich-text HTML from the Quill editor. Detect which
+// one we have and render accordingly.
+function isHtml(str) {
+  return /<[a-z][\s\S]*>/i.test(str)
+}
 
 export default function BlogPost() {
   const { slug } = useParams()
   const fallback = POSTS.find((p) => p.slug === slug) || null
   const { data: post } = useApi(`/posts/${slug}`, fallback)
+  const cover = post ? coverFor(post) : null
 
   useSEO({
     title: post ? post.title : 'Article not found',
     description: post?.excerpt || 'Astrology and numerology articles by AstroVedansh.',
     path: `/blog/${slug}`,
     type: 'article',
+    image: cover,
     noindex: !post,
     jsonLd: post
       ? [
@@ -21,6 +33,7 @@ export default function BlogPost() {
             '@type': 'BlogPosting',
             headline: post.title,
             description: post.excerpt,
+            image: [SITE_URL + cover],
             datePublished: post.date || post.published_at,
             author: { '@type': 'Organization', name: 'AstroVedansh', url: 'https://astrovedansh.org/' },
             publisher: { '@id': 'https://astrovedansh.org/#org' },
@@ -42,7 +55,11 @@ export default function BlogPost() {
     )
   }
 
-  const paragraphs = (post.body || '').split('\n').filter(Boolean)
+  const body = post.body || ''
+  const richBody = isHtml(body)
+  const paragraphs = richBody ? [] : body.split('\n').filter(Boolean)
+  const cleanHtml = richBody ? DOMPurify.sanitize(body, { ALLOWED_TAGS }) : ''
+
   return (
     <>
       <section className="bg-maroon-800 py-16 text-center text-cream-100">
@@ -54,16 +71,27 @@ export default function BlogPost() {
           </p>
         </div>
       </section>
-      <article className="section-pad">
-        <div className="container-av max-w-3xl space-y-5 text-base leading-relaxed text-maroon-950/85">
-          {paragraphs.map((para, i) => (
-            <p key={i}>{para}</p>
-          ))}
-          <div className="rounded-2xl bg-cream-100 p-6 text-center">
+      <article className="section-pad !pt-0">
+        <div className="container-av max-w-3xl">
+          <img
+            src={cover}
+            alt={post.title}
+            className="-mt-10 mb-10 aspect-[1200/630] w-full rounded-2xl border border-maroon-100 object-cover shadow-lg"
+          />
+          {richBody ? (
+            <div className="article-content" dangerouslySetInnerHTML={{ __html: cleanHtml }} />
+          ) : (
+            <div className="space-y-5 text-base leading-relaxed text-maroon-950/85">
+              {paragraphs.map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </div>
+          )}
+          <div className="mt-8 rounded-2xl bg-cream-100 p-6 text-center">
             <p className="font-heading font-semibold text-maroon-900">Want this analysed for your own chart?</p>
             <Link to="/consultation" className="btn-primary mt-4">Book a Consultation</Link>
           </div>
-          <Link to="/blog" className="inline-block font-heading text-sm font-bold text-maroon-700">← All articles</Link>
+          <Link to="/blog" className="mt-6 inline-block font-heading text-sm font-bold text-maroon-700">← All articles</Link>
         </div>
       </article>
     </>

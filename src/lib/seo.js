@@ -2,7 +2,8 @@ import { useEffect } from 'react'
 
 const SITE_URL = 'https://astrovedansh.org'
 const SITE_NAME = 'AstroVedansh'
-const DEFAULT_IMAGE = `${SITE_URL}/assets/av-09.png`
+// 1200×630 — the size Discover, Open Graph and Twitter cards expect.
+const DEFAULT_IMAGE = `${SITE_URL}/assets/blog/default.png`
 
 function setMeta(attr, key, content) {
   let el = document.head.querySelector(`meta[${attr}="${key}"]`)
@@ -29,10 +30,13 @@ function setCanonical(url) {
  * optional JSON-LD blocks. Works client-side; index.html carries the global
  * Organization/WebSite JSON-LD so crawlers that skip JS still get the basics.
  */
-export function useSEO({ title, description, path = '/', type = 'website', jsonLd = null, noindex = false }) {
+export function useSEO({ title, description, path = '/', type = 'website', image = null, jsonLd = null, noindex = false }) {
   useEffect(() => {
     const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} | Astrologer · Numerologist · Life Counsellor`
     const url = SITE_URL + path
+    // Discover/social crawlers want a large (≥1200px) image per page, not one
+    // shared default — pages can pass their own via `image`.
+    const resolvedImage = image ? (image.startsWith('http') ? image : SITE_URL + image) : DEFAULT_IMAGE
 
     document.title = fullTitle
     setMeta('name', 'description', description)
@@ -44,12 +48,14 @@ export function useSEO({ title, description, path = '/', type = 'website', jsonL
     setMeta('property', 'og:description', description)
     setMeta('property', 'og:url', url)
     setMeta('property', 'og:type', type)
-    setMeta('property', 'og:image', DEFAULT_IMAGE)
+    setMeta('property', 'og:image', resolvedImage)
+    setMeta('property', 'og:image:width', '1200')
+    setMeta('property', 'og:image:height', '630')
     setMeta('property', 'og:locale', 'en_IN')
     setMeta('name', 'twitter:card', 'summary_large_image')
     setMeta('name', 'twitter:title', fullTitle)
     setMeta('name', 'twitter:description', description)
-    setMeta('name', 'twitter:image', DEFAULT_IMAGE)
+    setMeta('name', 'twitter:image', resolvedImage)
 
     // Page-scoped JSON-LD (global Organization lives in index.html)
     document.querySelectorAll('script[data-seo="page"]').forEach((s) => s.remove())
@@ -61,7 +67,7 @@ export function useSEO({ title, description, path = '/', type = 'website', jsonL
       s.textContent = JSON.stringify(block)
       document.head.appendChild(s)
     })
-  }, [title, description, path, type, noindex, JSON.stringify(jsonLd)]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [title, description, path, type, image, noindex, JSON.stringify(jsonLd)]) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 export function breadcrumbs(items) {
