@@ -5,6 +5,7 @@ import { PageHero } from '../components/Section.jsx'
 import { Icon } from '../components/Decor.jsx'
 import { kundliSnapshot } from '../lib/astro.js'
 import { mulank, bhagyank, meaning } from '../lib/numerology.js'
+import { geocode, fetchRashi } from '../lib/astroApi.js'
 
 export default function KundliCalculator() {
   useSEO({
@@ -12,19 +13,43 @@ export default function KundliCalculator() {
     description: 'Instant free Vedic kundli snapshot: moon rashi, sun rashi, nakshatra with pada, birth tithi, mulank and bhagyank. No signup needed.',
     path: '/free-kundli-calculator',
   })
-  const [form, setForm] = useState({ name: '', date: '', time: '12:00' })
+  const [form, setForm] = useState({ name: '', date: '', time: '12:00', place: '' })
   const [result, setResult] = useState(null)
+  const [loading, setLoading] = useState(false)
 
-  function calculate(e) {
+  async function calculate(e) {
     e.preventDefault()
     const dob = new Date(`${form.date}T${form.time || '12:00'}:00+05:30`)
     if (Number.isNaN(dob.getTime())) return
-    setResult({
-      snapshot: kundliSnapshot(dob),
-      mulank: mulank(dob),
-      bhagyank: bhagyank(dob),
-      name: form.name,
-    })
+    setLoading(true)
+
+    const base = { mulank: mulank(dob), bhagyank: bhagyank(dob), name: form.name }
+
+    if (form.place.trim()) {
+      try {
+        const loc = await geocode(form.place.trim())
+        const [hour, minute] = (form.time || '12:00').split(':').map(Number)
+        const rashi = await fetchRashi({
+          name: form.name || 'Unknown',
+          birth_year: dob.getFullYear(),
+          birth_month: dob.getMonth() + 1,
+          birth_day: dob.getDate(),
+          birth_hour: hour,
+          birth_minute: minute,
+          latitude: loc.latitude,
+          longitude: loc.longitude,
+          timezone: loc.timezone || 'Asia/Kolkata',
+        })
+        setResult({ ...base, live: rashi, place: loc.display_name || form.place })
+        setLoading(false)
+        return
+      } catch {
+        // fall through to the local, place-independent snapshot below
+      }
+    }
+
+    setResult({ ...base, snapshot: kundliSnapshot(dob) })
+    setLoading(false)
   }
 
   return (
@@ -53,9 +78,15 @@ export default function KundliCalculator() {
                   <input type="time" className="input-av" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} />
                 </div>
               </div>
-              <button className="btn-primary w-full">Generate My Free Kundli Snapshot</button>
+              <div>
+                <label className="label-av">Place of Birth</label>
+                <input className="input-av" placeholder="City, e.g. Jaipur (optional, sharpens accuracy)" value={form.place} onChange={(e) => setForm({ ...form, place: e.target.value })} />
+              </div>
+              <button disabled={loading} className="btn-primary w-full disabled:opacity-60">
+                {loading ? 'Calculating…' : 'Generate My Free Kundli Snapshot'}
+              </button>
               <p className="text-center text-xs text-maroon-950/50">
-                Instant calculation in your browser — nothing is stored.
+                Instant calculation — nothing is stored.
               </p>
             </div>
           </form>
@@ -65,15 +96,26 @@ export default function KundliCalculator() {
                 <h2 className="font-display text-3xl text-gold-400">
                   {result.name ? `${result.name}'s` : 'Your'} Vedic Snapshot
                 </h2>
+                {result.place && <p className="mt-1 text-xs text-cream-100/60">Calculated for {result.place}</p>}
                 <dl className="mt-6 grid gap-4 sm:grid-cols-2">
-                  {[
-                    ['Moon Rashi', result.snapshot.moonRashi],
-                    ['Sun Rashi', result.snapshot.sunRashi],
-                    ['Nakshatra', `${result.snapshot.nakshatra} (Pada ${result.snapshot.pada})`],
-                    ['Birth Tithi', result.snapshot.tithi],
-                    ['Mulank (Root No.)', result.mulank],
-                    ['Bhagyank (Destiny No.)', result.bhagyank],
-                  ].map(([k, v]) => (
+                  {(result.live
+                    ? [
+                        ['Moon Rashi', `${result.live.rashi} · ${result.live.hindiName}`],
+                        ['Rashi Lord', result.live.rashiLord],
+                        ['Nakshatra', `${result.live.nakshatra} (Pada ${result.live.nakshatraPada})`],
+                        ['Nakshatra Lord', result.live.nakshatraLord],
+                        ['Mulank (Root No.)', result.mulank],
+                        ['Bhagyank (Destiny No.)', result.bhagyank],
+                      ]
+                    : [
+                        ['Moon Rashi', result.snapshot.moonRashi],
+                        ['Sun Rashi', result.snapshot.sunRashi],
+                        ['Nakshatra', `${result.snapshot.nakshatra} (Pada ${result.snapshot.pada})`],
+                        ['Birth Tithi', result.snapshot.tithi],
+                        ['Mulank (Root No.)', result.mulank],
+                        ['Bhagyank (Destiny No.)', result.bhagyank],
+                      ]
+                  ).map(([k, v]) => (
                     <div key={k} className="rounded-xl bg-maroon-700/60 p-4">
                       <dt className="font-heading text-xs font-bold uppercase tracking-wider text-gold-400">{k}</dt>
                       <dd className="mt-1 font-heading text-lg font-semibold">{v}</dd>
@@ -81,10 +123,16 @@ export default function KundliCalculator() {
                   ))}
                 </dl>
                 <div className="mt-6 rounded-xl bg-maroon-950/40 p-4 text-sm leading-relaxed">
-                  <p><strong className="text-gold-400">Your Destiny Number says:</strong> {meaning(result.bhagyank)}</p>
+                  {result.live ? (
+                    <p><strong className="text-gold-400">Your Moon Sign says:</strong> {result.live.traitsEnglish}</p>
+                  ) : (
+                    <p><strong className="text-gold-400">Your Destiny Number says:</strong> {meaning(result.bhagyank)}</p>
+                  )}
                 </div>
                 <p className="mt-4 text-xs text-cream-100/60">
-                  This is a simplified snapshot. Exact lagna, dashas and divisional charts need your birth place and a full reading.
+                  {result.live
+                    ? 'Moon sign and nakshatra are calculated for your exact birth place with the Swiss Ephemeris. Full lagna, dashas and divisional charts still need a complete reading.'
+                    : 'This is a simplified snapshot (no birth place given). Add your place of birth above for an exact moon sign and nakshatra.'}
                 </p>
                 <div className="mt-6 rounded-xl border border-gold-400/40 bg-maroon-950/40 p-5 text-center">
                   <p className="font-heading font-semibold text-cream-100">Want complete personal analysis of your chart?</p>

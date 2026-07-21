@@ -19,6 +19,14 @@ export default function BlogPost() {
   const { data: post } = useApi(`/posts/${slug}`, fallback)
   const cover = post ? coverFor(post) : null
 
+  // Timely posts (transit alerts, muhurta dates — flagged `is_news` in the
+  // CMS) are marked up as NewsArticle for Google News; evergreen guides stay
+  // BlogPosting, which is what they actually are.
+  const isNews = Boolean(post?.is_news)
+  const author = post?.author_name
+    ? { '@type': 'Person', name: post.author_name }
+    : { '@type': 'Organization', name: 'AstroVedansh', url: 'https://astrovedansh.org/' }
+
   useSEO({
     title: post ? post.title : 'Article not found',
     description: post?.excerpt || 'Astrology and numerology articles by AstroVedansh.',
@@ -30,12 +38,13 @@ export default function BlogPost() {
       ? [
           {
             '@context': 'https://schema.org',
-            '@type': 'BlogPosting',
+            '@type': isNews ? 'NewsArticle' : 'BlogPosting',
             headline: post.title,
             description: post.excerpt,
             image: [SITE_URL + cover],
             datePublished: post.date || post.published_at,
-            author: { '@type': 'Organization', name: 'AstroVedansh', url: 'https://astrovedansh.org/' },
+            ...(isNews && post.updated_at ? { dateModified: post.updated_at } : {}),
+            author,
             publisher: { '@id': 'https://astrovedansh.org/#org' },
             mainEntityOfPage: `https://astrovedansh.org/blog/${slug}`,
             articleSection: post.category,
@@ -64,10 +73,13 @@ export default function BlogPost() {
     <>
       <section className="bg-maroon-800 py-16 text-center text-cream-100">
         <div className="container-av max-w-3xl">
-          <p className="eyebrow !text-gold-400">{post.category}</p>
+          <p className="eyebrow !text-gold-400">
+            {post.category}
+            {isNews && <span className="ml-2 rounded-full border border-gold-400/50 px-2 py-0.5 text-[10px]">Timely</span>}
+          </p>
           <h1 className="mt-3 font-display text-4xl md:text-5xl">{post.title}</h1>
           <p className="mt-4 text-sm text-cream-100/70">
-            {new Date(post.date || post.published_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })} · AstroVedansh
+            {new Date(post.date || post.published_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })} · {post.author_name || 'AstroVedansh'}
           </p>
         </div>
       </section>

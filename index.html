@@ -35,7 +35,7 @@
       "@context": "https://schema.org",
       "@graph": [
         {
-          "@type": "Organization",
+          "@type": ["Organization", "NewsMediaOrganization"],
           "@id": "https://astrovedansh.org/#org",
           "name": "AstroVedansh",
           "url": "https://astrovedansh.org/",
@@ -51,7 +51,9 @@
             "https://perfect-timing.astrovedansh.com"
           ],
           "areaServed": "IN",
-          "knowsAbout": ["Vedic astrology", "Numerology", "Kundli analysis", "Panchang", "Vedic remedies", "Gemstone recommendation"]
+          "knowsAbout": ["Vedic astrology", "Numerology", "Kundli analysis", "Panchang", "Vedic remedies", "Gemstone recommendation"],
+          "masthead": "https://astrovedansh.org/about",
+          "correctionsPolicy": "https://astrovedansh.org/corrections-policy"
         },
         {
           "@type": "WebSite",

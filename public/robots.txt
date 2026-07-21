@@ -35,3 +35,4 @@ User-agent: CCBot
 Allow: /
 
 Sitemap: https://astrovedansh.org/sitemap.xml
+Sitemap: https://phpbackend.astrovedansh.org/news-sitemap.xml

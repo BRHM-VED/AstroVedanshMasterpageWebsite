@@ -30,6 +30,7 @@ const COLS = [
       ['Privacy Policy', '/privacy-policy'],
       ['Terms & Policies', '/terms'],
       ['Refund Policy', '/refund-policy'],
+      ['Corrections Policy', '/corrections-policy'],
     ],
   },
 ]

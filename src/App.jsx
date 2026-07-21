@@ -50,6 +50,7 @@ export default function App() {
           <Route path="/privacy-policy" element={<Legal kind="privacy" />} />
           <Route path="/terms" element={<Legal kind="terms" />} />
           <Route path="/refund-policy" element={<Legal kind="refund" />} />
+          <Route path="/corrections-policy" element={<Legal kind="corrections" />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
