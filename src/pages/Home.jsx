@@ -428,14 +428,19 @@ export default function Home() {
           acceptedAnswer: { '@type': 'Answer', text: f.a },
         })),
       },
+      // Digital reports, not shippable goods — Service (not Product) so Google
+      // doesn't evaluate them as Merchant/shopping listings requiring
+      // shippingDetails/return-policy fields that wouldn't apply.
       ...REPORTS.map((r) => ({
         '@context': 'https://schema.org',
-        '@type': 'Product',
+        '@type': 'Service',
+        serviceType: 'Astrology report',
         name: r.title,
         description: `Best for: ${r.bestFor}. ${r.get}`,
         url: r.href,
         image: 'https://astrovedansh.org' + r.img,
-        brand: { '@type': 'Brand', name: 'AstroVedansh' },
+        provider: { '@id': 'https://astrovedansh.org/#org' },
+        areaServed: 'IN',
         offers: {
           '@type': 'Offer',
           price: r.price,
