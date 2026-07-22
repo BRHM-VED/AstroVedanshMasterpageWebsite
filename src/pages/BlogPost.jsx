@@ -28,8 +28,11 @@ export default function BlogPost() {
     : { '@type': 'Organization', name: 'AstroVedansh', url: 'https://astrovedansh.org/' }
 
   useSEO({
-    title: post ? post.title : 'Article not found',
-    description: post?.excerpt || 'Astrology and numerology articles by AstroVedansh.',
+    // meta_title/meta_description are independent SEO overrides — only the
+    // <title>/meta description/OG/Twitter tags use them. JSON-LD `headline`
+    // below stays tied to the actual on-page title, per schema.org guidance.
+    title: post ? (post.meta_title || post.title) : 'Article not found',
+    description: post?.meta_description || post?.excerpt || 'Astrology and numerology articles by AstroVedansh.',
     path: `/blog/${slug}`,
     type: 'article',
     image: cover,
