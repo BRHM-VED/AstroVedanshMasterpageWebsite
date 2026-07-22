@@ -25,8 +25,8 @@
   bracelets and kavach.
 
 ## Free tools
-- [Free Kundli Calculator](https://astrovedansh.org/free-kundli-calculator): moon rashi,
-  nakshatra, birth tithi, mulank and bhagyank.
+- [Free Kundli Analysis](https://astrovedansh.org/kundli): moon rashi, nakshatra, lagna,
+  full planet positions, current dasha, doshas and yogas, mulank and bhagyank.
 - [Daily Horoscope](https://astrovedansh.org/horoscope/daily) and
   [Horoscope 2026](https://astrovedansh.org/horoscope/2026) for all 12 rashis.
 - [Panchang](https://astrovedansh.org/panchang): tithi, nakshatra, yoga, karana, rahu kaal.

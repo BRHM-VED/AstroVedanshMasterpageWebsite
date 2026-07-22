@@ -24,7 +24,7 @@ const NAV = [
   {
     label: 'Free Tools',
     children: [
-      { to: '/free-kundli-calculator', label: 'Free Kundli Calculator' },
+      { to: '/kundli', label: 'Kundli Analysis' },
       { to: '/numerology-report', label: 'Numerology & Name Correction' },
     ],
   },

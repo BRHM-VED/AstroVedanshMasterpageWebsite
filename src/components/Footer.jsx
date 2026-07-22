@@ -15,7 +15,7 @@ const COLS = [
   {
     title: 'Free Resources',
     links: [
-      ['Free Kundli Calculator', '/free-kundli-calculator'],
+      ['Kundli Analysis', '/kundli'],
       ['Daily Horoscope', '/horoscope/daily'],
       ['Horoscope 2026', '/horoscope/2026'],
       ["Today's Panchang", '/panchang'],

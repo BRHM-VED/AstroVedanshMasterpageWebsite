@@ -36,6 +36,12 @@ export function julianDay(date) {
   return date.getTime() / 86400000 + 2440587.5
 }
 
+// Exact inverse of julianDay() above — turns the raw start_jd/end_jd values
+// the dasha API returns back into real dates.
+export function julianDayToDate(jd) {
+  return new Date((jd - 2440587.5) * 86400000)
+}
+
 function norm360(x) {
   return ((x % 360) + 360) % 360
 }
@@ -115,6 +121,34 @@ export function panchang(date = new Date()) {
     sunRashi: RASHIS[Math.floor(sunSid / 30)],
     rahuKaal: `${fmt(segStart)} – ${fmt(segStart + 1.5)}`,
   }
+}
+
+const ZODIAC_SIGNS = [
+  'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+  'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',
+]
+
+// natal/planets and natal/houses report `sign`/`degree_in_sign` in the
+// TROPICAL (Western) zodiac, not the sidereal one this whole site is built
+// on — confirmed by cross-checking against natal/rashi and the nakshatra
+// fields on the same response, which ARE sidereal. Re-derive the sidereal
+// sign ourselves from the raw longitude, using the ayanamsa the API itself
+// reports (from a sibling vedic/* call — natal/planets and natal/houses
+// don't include it) rather than our own local approximation, so this stays
+// exactly consistent with what natal/rashi already computes correctly.
+export function siderealFromLongitude(tropicalLongitude, ayanamsaDegrees) {
+  const sid = norm360(tropicalLongitude - ayanamsaDegrees)
+  return { sign: ZODIAC_SIGNS[Math.floor(sid / 30)], degreeInSign: sid % 30 }
+}
+
+// Walks a vedic/dashas/vimshottari response and picks out the mahadasha
+// (and, within it, the antardasha) that today's date actually falls in.
+export function currentDasha(dashaResponse, at = new Date()) {
+  const jd = julianDay(at)
+  const maha = dashaResponse?.dashas?.find((d) => jd >= d.start_jd && jd < d.end_jd)
+  if (!maha) return null
+  const antar = maha.antardashas?.find((a) => jd >= a.start_jd && jd < a.end_jd)
+  return { maha, antar }
 }
 
 export function kundliSnapshot(dateOfBirth) {

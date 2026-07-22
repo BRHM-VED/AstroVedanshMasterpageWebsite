@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useLayoutEffect } from 'react'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
@@ -47,7 +47,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/consultation" element={<Consultation />} />
-            <Route path="/free-kundli-calculator" element={<KundliCalculator />} />
+            <Route path="/kundli" element={<KundliCalculator />} />
+            <Route path="/free-kundli-calculator" element={<Navigate to="/kundli" replace />} />
             <Route path="/horoscope/daily" element={<DailyHoroscope />} />
             <Route path="/horoscope/2026" element={<YearlyHoroscope />} />
             <Route path="/numerology-report" element={<Numerology />} />

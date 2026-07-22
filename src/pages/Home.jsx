@@ -201,7 +201,7 @@ function Services() {
 
 function FreeTools() {
   const tools = [
-    { to: '/free-kundli-calculator', icon: 'diya', title: 'Free Kundli Calculator', text: 'Your moon sign, nakshatra and birth tithi in seconds.' },
+    { to: '/kundli', icon: 'diya', title: 'Free Kundli Analysis', text: 'Lagna, planets, current dasha, doshas and yogas — in seconds.' },
     { to: '/horoscope/daily', icon: 'moon', title: 'Daily Horoscope', text: 'Fresh guidance for all 12 rashis, every single day.' },
     { to: '/panchang', icon: 'calendar', title: "Today's Panchang", text: 'Tithi, nakshatra, yoga, karana and rahu kaal for today.' },
   ]

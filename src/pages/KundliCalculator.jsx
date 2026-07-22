@@ -3,15 +3,16 @@ import { useSEO } from '../lib/seo.js'
 import { Link } from 'react-router-dom'
 import { PageHero } from '../components/Section.jsx'
 import { Icon } from '../components/Decor.jsx'
+import KundliReport from '../components/KundliReport.jsx'
 import { kundliSnapshot } from '../lib/astro.js'
 import { mulank, bhagyank, meaning } from '../lib/numerology.js'
-import { geocode, fetchRashi } from '../lib/astroApi.js'
+import { geocode, fetchRashi, fetchPlanets, fetchHouses, fetchDoshas, fetchYogas, fetchVimshottariDasha } from '../lib/astroApi.js'
 
 export default function KundliCalculator() {
   useSEO({
-    title: 'Free Kundli Calculator — Moon Sign, Nakshatra & Birth Tithi',
-    description: 'Instant free Vedic kundli snapshot: moon rashi, sun rashi, nakshatra with pada, birth tithi, mulank and bhagyank. No signup needed.',
-    path: '/free-kundli-calculator',
+    title: 'Free Kundli Analysis — Detailed Vedic Report with Dasha & Doshas',
+    description: 'Free detailed Vedic kundli report: lagna, all planet positions, current dasha period, doshas and yogas — computed with the Swiss Ephemeris. No signup needed.',
+    path: '/kundli',
   })
   const [form, setForm] = useState({ name: '', date: '', time: '12:00', place: '' })
   const [result, setResult] = useState(null)
@@ -22,6 +23,7 @@ export default function KundliCalculator() {
     const dob = new Date(`${form.date}T${form.time || '12:00'}:00+05:30`)
     if (Number.isNaN(dob.getTime())) return
     setLoading(true)
+    setResult(null)
 
     const base = { mulank: mulank(dob), bhagyank: bhagyank(dob), name: form.name }
 
@@ -29,7 +31,7 @@ export default function KundliCalculator() {
       try {
         const loc = await geocode(form.place.trim())
         const [hour, minute] = (form.time || '12:00').split(':').map(Number)
-        const rashi = await fetchRashi({
+        const payload = {
           name: form.name || 'Unknown',
           birth_year: dob.getFullYear(),
           birth_month: dob.getMonth() + 1,
@@ -39,8 +41,24 @@ export default function KundliCalculator() {
           latitude: loc.latitude,
           longitude: loc.longitude,
           timezone: loc.timezone || 'Asia/Kolkata',
-        })
-        setResult({ ...base, live: rashi, place: loc.display_name || form.place })
+        }
+        // The core rashi call has to succeed (it drives the summary card);
+        // the richer detail calls degrade independently so one slow/failed
+        // endpoint doesn't blank out the whole report.
+        const [rashi, planets, houses, doshas, yogas, dasha] = await Promise.all([
+          fetchRashi(payload),
+          fetchPlanets(payload).catch(() => null),
+          fetchHouses(payload).catch(() => null),
+          fetchDoshas(payload).catch(() => null),
+          fetchYogas(payload).catch(() => null),
+          fetchVimshottariDasha(payload).catch(() => null),
+        ])
+        // natal/planets and natal/houses don't report their own ayanamsa —
+        // borrow it from whichever vedic/* sibling call succeeded (they all
+        // use the same Lahiri config) so KundliReport can convert the
+        // tropical sign fields those two endpoints return into sidereal ones.
+        const ayanamsaDegrees = doshas?.engine?.ayanamsa_degrees ?? yogas?.engine?.ayanamsa_degrees ?? 24.0
+        setResult({ ...base, live: rashi, place: loc.display_name || form.place, planets, houses, doshas, yogas, dasha, ayanamsaDegrees })
         setLoading(false)
         return
       } catch {
@@ -56,12 +74,12 @@ export default function KundliCalculator() {
     <>
       <PageHero
         eyebrow="100% Free Tool"
-        title="Free Kundli Calculator"
-        sub="Enter your birth details for an instant Vedic snapshot — moon rashi, nakshatra, birth tithi and your core numerology numbers."
+        title="Free Kundli Analysis"
+        sub="Enter your birth details for a detailed Vedic report — lagna, planet positions, current dasha, doshas and yogas, computed with the Swiss Ephemeris."
       />
       <section className="section-pad">
         <div className="container-av grid items-start gap-10 lg:grid-cols-2">
-          <form onSubmit={calculate} className="rounded-3xl border border-maroon-100 bg-white p-8 shadow-lg">
+          <form onSubmit={calculate} className="min-w-0 rounded-3xl border border-maroon-100 bg-white p-8 shadow-lg">
             <h2 className="font-display text-3xl text-maroon-900">Your Birth Details</h2>
             <div className="mt-6 space-y-4">
               <div>
@@ -83,14 +101,14 @@ export default function KundliCalculator() {
                 <input className="input-av" placeholder="City, e.g. Jaipur (optional, sharpens accuracy)" value={form.place} onChange={(e) => setForm({ ...form, place: e.target.value })} />
               </div>
               <button disabled={loading} className="btn-primary w-full disabled:opacity-60">
-                {loading ? 'Calculating…' : 'Generate My Free Kundli Snapshot'}
+                {loading ? 'Calculating…' : 'Generate My Free Kundli Analysis'}
               </button>
               <p className="text-center text-xs text-maroon-950/50">
                 Instant calculation — nothing is stored.
               </p>
             </div>
           </form>
-          <div>
+          <div className="min-w-0">
             {result ? (
               <div className="rounded-3xl bg-maroon-800 p-8 text-cream-100 shadow-xl">
                 <h2 className="font-display text-3xl text-gold-400">
@@ -131,9 +149,19 @@ export default function KundliCalculator() {
                 </div>
                 <p className="mt-4 text-xs text-cream-100/60">
                   {result.live
-                    ? 'Moon sign and nakshatra are calculated for your exact birth place with the Swiss Ephemeris. Full lagna, dashas and divisional charts still need a complete reading.'
-                    : 'This is a simplified snapshot (no birth place given). Add your place of birth above for an exact moon sign and nakshatra.'}
+                    ? 'Moon sign, nakshatra, planet positions and current dasha are calculated for your exact birth place with the Swiss Ephemeris. Divisional charts and personalised predictions still need a complete reading.'
+                    : 'This is a simplified snapshot (no birth place given). Add your place of birth above for an exact moon sign, nakshatra and detailed report.'}
                 </p>
+                {result.live && (
+                  <KundliReport
+                    planets={result.planets}
+                    houses={result.houses}
+                    doshas={result.doshas}
+                    yogas={result.yogas}
+                    dasha={result.dasha}
+                    ayanamsaDegrees={result.ayanamsaDegrees}
+                  />
+                )}
                 <div className="mt-6 rounded-xl border border-gold-400/40 bg-maroon-950/40 p-5 text-center">
                   <p className="font-heading font-semibold text-cream-100">Want complete personal analysis of your chart?</p>
                   <Link to="/consultation" className="btn-gold mt-4 w-full">Get Astrology Report</Link>
