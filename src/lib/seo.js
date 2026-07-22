@@ -30,7 +30,7 @@ function setCanonical(url) {
  * optional JSON-LD blocks. Works client-side; index.html carries the global
  * Organization/WebSite JSON-LD so crawlers that skip JS still get the basics.
  */
-export function useSEO({ title, description, path = '/', type = 'website', image = null, jsonLd = null, noindex = false }) {
+export function useSEO({ title, description, path = '/', type = 'website', image = null, jsonLd = null, noindex = false, lang = 'en' }) {
   useEffect(() => {
     const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} | Astrologer · Numerologist · Life Counsellor`
     const url = SITE_URL + path
@@ -39,6 +39,10 @@ export function useSEO({ title, description, path = '/', type = 'website', image
     const resolvedImage = image ? (image.startsWith('http') ? image : SITE_URL + image) : DEFAULT_IMAGE
 
     document.title = fullTitle
+    // index.html hardcodes lang="en" — Hindi blog posts need to override it,
+    // since a declared/actual language mismatch is a real signal crawlers
+    // (Google News in particular) check for.
+    document.documentElement.lang = lang
     setMeta('name', 'description', description)
     setCanonical(url)
     setMeta('name', 'robots', noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large')

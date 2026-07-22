@@ -37,6 +37,7 @@ export default function BlogPost() {
     type: 'article',
     image: cover,
     noindex: !post,
+    lang: post?.language === 'hi' ? 'hi' : 'en',
     jsonLd: post
       ? [
           {
@@ -51,7 +52,7 @@ export default function BlogPost() {
             publisher: { '@id': 'https://astrovedansh.org/#org' },
             mainEntityOfPage: `https://astrovedansh.org/blog/${slug}`,
             articleSection: post.category,
-            inLanguage: 'en-IN',
+            inLanguage: post.language === 'hi' ? 'hi-IN' : 'en-IN',
           },
           breadcrumbs([['Home', '/'], ['Blog', '/blog'], [post.title, `/blog/${slug}`]]),
         ]
