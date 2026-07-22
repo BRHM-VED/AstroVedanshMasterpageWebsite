@@ -48,7 +48,17 @@ function Hero() {
         <div className="relative mx-auto hidden w-64 md:block lg:w-80">
           <Mandala className="absolute -inset-14 text-gold-400/25" />
           <div className="relative overflow-hidden rounded-t-[999px] rounded-b-[2rem] border-[3px] border-gold-500/70 shadow-2xl shadow-maroon-950/60">
-            <img src="/assets/av-09.png" alt="AstroVedansh — astrologer and numerologist" className="w-full" />
+            <picture>
+              <source srcSet="/assets/av-09.webp" type="image/webp" />
+              <img
+                src="/assets/av-09.jpg"
+                alt="AstroVedansh — astrologer and numerologist"
+                className="w-full"
+                width="900"
+                height="1078"
+                fetchPriority="high"
+              />
+            </picture>
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-maroon-950/85 to-transparent px-5 pb-4 pt-12 text-center">
               <p className="font-heading text-sm font-bold tracking-wide text-cream-100">{SITE.roles}</p>
             </div>

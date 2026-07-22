@@ -3,12 +3,14 @@ import { useSEO } from '../lib/seo.js'
 import { PageHero } from '../components/Section.jsx'
 import { IconBadge } from '../components/Decor.jsx'
 import Pagination, { usePage } from '../components/Pagination.jsx'
-import { PRODUCTS, SITE } from '../data/content.js'
+import { PRODUCTS } from '../data/content.js'
 import { useApi } from '../lib/api.js'
+import { useSiteSettings } from '../lib/settings.js'
 
 const PER_PAGE = 12
 
 export default function Shop() {
+  const SITE = useSiteSettings()
   const { data: products } = useApi('/products', PRODUCTS)
   const [searchParams] = useSearchParams()
   const cat = searchParams.get('category') || 'All'

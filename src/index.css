@@ -117,7 +117,9 @@ body {
 }
 
 .input-av {
-  @apply w-full rounded-xl border border-maroon-100 bg-white px-4 py-3 text-sm text-maroon-950 placeholder:text-maroon-950/40 focus:border-maroon-700 focus:outline-none focus:ring-1 focus:ring-maroon-700;
+  /* text-base (16px), not text-sm — anything smaller triggers iOS Safari's
+     forced zoom-on-focus on every lead-capture form site-wide. */
+  @apply w-full rounded-xl border border-maroon-100 bg-white px-4 py-3 text-base text-maroon-950 placeholder:text-maroon-950/40 focus:border-maroon-700 focus:outline-none focus:ring-1 focus:ring-maroon-700;
 }
 
 .label-av {
@@ -190,4 +192,10 @@ body {
   .animate-marquee, .animate-spin-slow, .animate-float, .animate-progress {
     animation: none;
   }
+}
+
+/* Long mobile nav menus can push "Book a Call" into the same bottom-right
+   corner as the fixed WhatsApp button — hide the float while the menu is open. */
+body.mobile-menu-open .whatsapp-float-btn {
+  display: none;
 }

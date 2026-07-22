@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 const SITE_URL = 'https://astrovedansh.org'
 const SITE_NAME = 'AstroVedansh'
 // 1200×630 — the size Discover, Open Graph and Twitter cards expect.
-const DEFAULT_IMAGE = `${SITE_URL}/assets/blog/default.png`
+const DEFAULT_IMAGE = `${SITE_URL}/assets/blog/default.jpg`
 
 function setMeta(attr, key, content) {
   let el = document.head.querySelector(`meta[${attr}="${key}"]`)

@@ -2,7 +2,7 @@ import { PageHero } from '../components/Section.jsx'
 import { useSEO } from '../lib/seo.js'
 import { IconBadge } from '../components/Decor.jsx'
 import LeadForm from '../components/LeadForm.jsx'
-import { SITE } from '../data/content.js'
+import { useSiteSettings } from '../lib/settings.js'
 
 export default function Contact() {
   useSEO({
@@ -10,6 +10,7 @@ export default function Contact() {
     description: 'Reach the AstroVedansh team for reports, bookings and guidance. Support 10 AM – 7 PM IST, Monday to Saturday.',
     path: '/contact',
   })
+  const SITE = useSiteSettings()
   return (
     <>
       <PageHero

@@ -28,7 +28,17 @@ export default function About() {
         <div className="container-av grid items-center gap-12 lg:grid-cols-2">
           <div className="relative mx-auto max-w-sm">
             <div className="absolute -inset-4 rounded-3xl bg-gold-500/20 blur-xl" />
-            <img src="/assets/av-09.png" alt="AstroVedansh astrologer" className="relative rounded-3xl border-4 border-gold-500/60 shadow-2xl" />
+            <picture>
+              <source srcSet="/assets/av-09.webp" type="image/webp" />
+              <img
+                src="/assets/av-09.jpg"
+                alt="AstroVedansh astrologer"
+                className="relative w-full rounded-3xl border-4 border-gold-500/60 shadow-2xl"
+                width="900"
+                height="1078"
+                loading="lazy"
+              />
+            </picture>
           </div>
           <div>
             <p className="eyebrow">Namaste</p>

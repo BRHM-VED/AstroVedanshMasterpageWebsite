@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { SITE } from '../data/content.js'
+import { useSiteSettings } from '../lib/settings.js'
 
 const NAV = [
   { to: '/', label: 'Home' },
@@ -35,7 +35,7 @@ const NAV = [
   { to: '/about', label: 'About' },
 ]
 
-function Wordmark() {
+function Wordmark({ tagline }) {
   return (
     <Link to="/" className="flex items-center gap-3">
       <img src="/assets/av-20.png" alt="AstroVedansh" className="h-11 w-11 rounded-full ring-2 ring-gold-500" />
@@ -44,7 +44,7 @@ function Wordmark() {
           Astro<span className="text-gold-400">Vedansh</span>
         </span>
         <span className="block font-heading text-[10px] font-semibold uppercase tracking-[0.25em] text-cream-100/70">
-          {SITE.tagline}
+          {tagline}
         </span>
       </span>
     </Link>
@@ -87,6 +87,13 @@ function Dropdown({ item }) {
 
 export default function Header() {
   const [open, setOpen] = useState(false)
+  const SITE = useSiteSettings()
+
+  useEffect(() => {
+    document.body.classList.toggle('mobile-menu-open', open)
+    return () => document.body.classList.remove('mobile-menu-open')
+  }, [open])
+
   return (
     <header className="sticky top-0 z-50 shadow-lg shadow-maroon-950/20">
       <div className="hidden bg-maroon-950 text-cream-100/80 sm:block">
@@ -101,7 +108,7 @@ export default function Header() {
       </div>
       <div className="border-b-2 border-gold-500/60 bg-maroon-800">
         <div className="container-av flex items-center justify-between py-3">
-          <Wordmark />
+          <Wordmark tagline={SITE.tagline} />
           <nav className="hidden items-center lg:flex">
             {NAV.map((item) =>
               item.children ? (
@@ -138,13 +145,13 @@ export default function Header() {
           <nav className="border-t border-maroon-700 bg-maroon-800 pb-4 lg:hidden">
             {NAV.flatMap((item) => (item.children ? item.children : [item])).map((item) => (
               <NavItem
-                key={item.to || item.href}
+                key={`${item.to || item.href}-${item.label}`}
                 item={item}
                 onClick={() => setOpen(false)}
                 className="block px-6 py-3 font-heading font-semibold text-cream-100/90 hover:text-gold-400"
               />
             ))}
-            <div className="px-6 pt-2">
+            <div className="px-6 pb-20 pt-2">
               <Link to="/consultation" onClick={() => setOpen(false)} className="btn-gold w-full text-sm">
                 Book a Call
               </Link>

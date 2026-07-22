@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { SITE } from '../data/content.js'
+import { useSiteSettings } from '../lib/settings.js'
 
 const COLS = [
   {
@@ -36,6 +36,7 @@ const COLS = [
 ]
 
 export default function Footer() {
+  const SITE = useSiteSettings()
   return (
     <footer className="bg-maroon-950 text-cream-100/80">
       <div className="container-av grid gap-10 py-14 md:grid-cols-4">
